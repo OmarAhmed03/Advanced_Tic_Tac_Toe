@@ -1,52 +1,74 @@
-name: Build and Deploy on Linux
+name: Build and Release
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    - name: Set up Qt
+      uses: miurahr/setup-qt-action@v2
+      with:
+        version: '6.2.0'
+        host: 'windows'
+        target: 'desktop'
+        arch: 'win64_msvc2019_64'
+
     - name: Install dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libgl1-mesa-dev libglu1-mesa-dev build-essential cmake
+        choco install ninja cmake --install-arguments='"ADD_CMAKE_TO_PATH=System"'
 
-    - name: Configure with CMake
-      run: cmake -B build -S . -DCMAKE_PREFIX_PATH=/usr/lib/qt6
+    - name: Configure CMake
+      run: cmake -S . -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release
 
     - name: Build with CMake
       run: cmake --build build --config Release
-      
-    - name: Create Release Zip (alternative)
-      run: |
-        set -e  # Exit on failure
-        find build/Release -type f -exec zip -r advanced-tic-tac-toe.zip {} \;  || true  # Suppress errors
 
-    - name: Upload Release Artifact (if zip created)
+    - name: Package executable
+      run: cmake --install build --prefix package
+
+    - name: Upload Release Asset
       uses: actions/upload-artifact@v3
-      if: success() && test -f "advanced-tic-tac-toe.zip"  # Only upload if zip exists
-      env:
-        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
       with:
-        name: advanced-tic-tac-toe-release
-        path: advanced-tic-tac-toe.zip
+        name: Advanced-Tic-Tac-Toe
+        path: package/
 
-    - name: Create Release (update token with appropriate permissions)  # Assuming you still want to create a release
+  release:
+    runs-on: windows-latest
+    needs: build
+
+    steps:
+    - name: Download build artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: Advanced-Tic-Tac-Toe
+        path: .
+
+    - name: Create Release
+      id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}  # Use the reference name (e.g., branch or tag)
-        release_name: Release ${{ github.ref }}  # Update name format if desired
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
         draft: false
         prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./package/
+        asset_name: Advanced-Tic-Tac-Toe.exe
+        asset_content_type: application/octet-stream
