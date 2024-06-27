@@ -47,7 +47,6 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: Windows-Executable
-
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
