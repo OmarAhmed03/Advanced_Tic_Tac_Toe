@@ -1,6 +1,7 @@
-#ifndef FORM_H
-#define FORM_H
+#ifndef SIGN_SCREEN_H
+#define SIGN_SCREEN_H
 
+#include <QMainWindow>
 #include <QWidget>
 #include <QWidget>
 #include <QLabel>
@@ -8,17 +9,18 @@
 #include <QMessageBox>
 #include <QPushButton>
 #include <QLayout>
+#include <QPixmap>
 #include <QFile>
-#include "custom_button.h"
+#include "../../../utilities/Buttons/custom_button.h"
+#include "../../../utilities/main_includes.h"
+#include "../main_screen/main_screen.h"
+#include "database.h"
 
-
-
-
-class Form : public QWidget
+class SignScreen : public QWidget
 {
     Q_OBJECT
 public:
-    explicit Form(QWidget *parent = nullptr);
+    explicit SignScreen(QWidget *parent = nullptr);
 
 public slots:
     //void login_pressed();
@@ -36,6 +38,6 @@ private:
     QMessageBox msgBox;
     Custom_Button* login;
     Custom_Button* signup;
+    Database db;
 };
-
-#endif // FORM_H
+#endif // SIGN_SCREEN_H

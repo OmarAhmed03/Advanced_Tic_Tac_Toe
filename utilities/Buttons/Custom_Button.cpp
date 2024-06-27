@@ -10,7 +10,7 @@ Custom_Button::Custom_Button(const QString &text, QWidget *parent)
                   "    color: black;"
                   "    font-weight: bold;"
                   "    padding: 15px 15px;"
-                  "    margin: 0 40px;" // Add 20px margin
+                  "    margin: 0 5px;" // Add 20px margin
                   "}"
                   "QPushButton:pressed {"
                   "    background-color: darkyellow;"
@@ -60,7 +60,7 @@ void Custom_Button::setPressedEffect(bool enabled)
                       "    color: black;"
                       "    font-weight: bold;"
                       "    padding: 15px 15px;"
-                      "    margin: 0 40px;" // Add 20px margin
+                      "    margin: 0 5px;" // Add 20px margin
                       "}"
                       );
     } else {
@@ -72,7 +72,7 @@ void Custom_Button::setPressedEffect(bool enabled)
                       "    color: black;"
                       "    font-weight: bold;"
                       "    padding: 15px 15px;"
-                      "    margin: 0 40px;" // Add 20px margin
+                      "    margin: 0 5px;" // Add 20px margin
                       "}"
                       "QPushButton:hover {"
                       "    background-color: lightyellow;"

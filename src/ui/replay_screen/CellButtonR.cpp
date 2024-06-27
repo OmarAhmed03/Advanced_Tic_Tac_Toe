@@ -1,9 +1,9 @@
-#include "CellButton.h"
-#include "game_screen.h"
+#include "CellButtonR.h"
+#include "replayscreen.h"
 
 
 
-CellButton::CellButton(GameScreen *parent) : QPushButton(parent), mainWindow(parent) {
+CellButtonR::CellButtonR(ReplayScreen *parent) : QPushButton(parent), mainWindow(parent) {
     setText("");
     //setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setFixedSize(120, 120); // Set fixed size for the button

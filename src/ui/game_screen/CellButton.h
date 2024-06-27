@@ -12,16 +12,16 @@ public:
     explicit CellButton(GameScreen *parent = nullptr);
 
 signals:
-    void cellClicked(int value);
+    // void cellClicked(int value);
 
 public slots:
-    void setCurrentPlayer(int player);
-
+    // void setCurrentPlayer(int player);
+    // int getCurrentPlayer();
 private slots:
-    void onClicked();
+    // void onClicked();
 
 private:
-    int currentPlayer_;
+    // int currentPlayer_;
     GameScreen *mainWindow; // Pointer to MainWindow
 };
 

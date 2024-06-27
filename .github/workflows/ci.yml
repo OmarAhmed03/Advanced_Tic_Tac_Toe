@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.7.0'
+        host: 'windows'
+        target: 'desktop'
+        arch: 'win64_msvc2019_64'
+        dir: 'C:/Qt'
+
+    - name: Set up CMake
+      uses: jwlawson/actions-setup-cmake@v1
+
+    - name: Configure CMake
+      run: cmake -B build -S . -DCMAKE_PREFIX_PATH=C:/Qt/6.7.0/msvc2019_64
+
+    - name: Build
+      run: cmake --build build --config Release
+
+    - name: Run tests
+      run: ctest --output-on-failure
+      working-directory: build
+
+    - name: Package the application
+      shell: pwsh
+      run: |
+        # Find the executable
+        $executable = "build/Release/Advanced-Tic-Tac-Toe.exe"
+        
+        # Use windeployqt to bundle dependencies
+        & "C:/Qt/6.7.0/msvc2019_64/bin/windeployqt.exe" $executable
+
+        # Create a zip file of the bundled executable
+        Compress-Archive -Path build/Release/* -DestinationPath build/Release/Advanced-Tic-Tac-Toe.zip
+
+    - name: Upload Release Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Advanced-Tic-Tac-Toe
+        path: build/Release/Advanced-Tic-Tac-Toe.zip

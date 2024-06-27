@@ -6,16 +6,16 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QLabel>
-#include <string>
-#include <sstream>
-#include <QPixmap> // For QPixmap to set background image
 #include <QPropertyAnimation>
 #include <QGraphicsOpacityEffect>
 
-//// defines
+//// Defines ////
 
-#define standard_hight 600
-#define standard_Width 500
+#define standard_height 600
+#define standard_Width  500
+
+#define NORMAL_MODE_DEPTH   3
+#define HARD_MODE_DEPTH     9
 
 
 #endif // MAIN_INCLUDES_H
