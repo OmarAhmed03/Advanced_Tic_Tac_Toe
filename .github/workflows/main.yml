@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - 'v*.*.*'
-  workflow_dispatch:
 
 jobs:
   build:
@@ -21,6 +20,7 @@ jobs:
         host: 'windows'
         target: 'desktop'
         arch: 'win64_msvc2019_64'
+        setup-python: 'false'
 
     - name: Install dependencies
       run: |
