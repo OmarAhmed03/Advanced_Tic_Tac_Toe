@@ -1,48 +1,41 @@
-name: Build and Deploy AppImage
-
+name: CI
 on:
   push:
-    branches: 
+    branches:
       - main
   pull_request:
-    branches: 
+    branches:
       - main
-
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libgl1-mesa-dev build-essential cmake appimagetool
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v4
+      with:
+        version: '6.7.0'
+        host: 'windows'
+        target: 'desktop'
+        arch: 'win64_msvc2019_64'
+        modules: 'qtwidgets'
+        setup-python: 'false'
 
-      - name: Configure with CMake
-        run: cmake -B build -S . -DCMAKE_PREFIX_PATH=/usr/lib/qt6
+    - name: Configure with CMake
+      run: cmake -B build -S . -DCMAKE_PREFIX_PATH=$env:Qt6_DIR
 
-      - name: Build with CMake
-        run: cmake --build build --config Release
+    - name: Build with CMake
+      run: cmake --build build --config Release
 
-      - name: Create AppImage recipe
-        run: |
-          echo "name: 'Build'" > appimage.yml
-          echo "description: 'Your application description'" >> appimage.yml
-          echo "runtime: qt6" >> appimage.yml
-          echo "arch: x86_64" >> appimage.yml
-          echo "version: 1.0.0" >> appimage.yml  # Update with your version
-          # Add any additional dependencies here (optional)
-          echo "files:" >> appimage.yml
-          echo "  - '/path/to/build/*'" >> appimage.yml  # Modify path if needed
+    - name: Create executable
+      run: |
+        cd build\Release
+        windeployqt.exe --qmldir . Advanced-Tic-Tac-Toe.exe
 
-      - name: Build AppImage
-        run: |
-          appimagetool --output=Build.AppImage appimage.yml
-
-      - name: Archive build output (AppImage)
-        uses: actions/upload-artifact@v3
-        with:
-          name: AppImage
-          path: Build.AppImage
+    - name: Archive executable
+      uses: actions/upload-artifact@v3
+      with:
+        name: Windows-Executable
+        path: build/Release/
