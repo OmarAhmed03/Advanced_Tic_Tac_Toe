@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libgl1-mesa-dev build-essential cmake
+        sudo apt-get install -y libgl1-mesa-dev build-essential cmake
 
     - name: Configure with CMake
       run: cmake -B build -S . -DCMAKE_PREFIX_PATH=/usr/lib/qt6
@@ -37,12 +37,14 @@ jobs:
     - name: Create Dockerfile
       run: |
         echo "FROM ubuntu:20.04" > Dockerfile
+        echo "RUN apt-get update && apt-get install -y software-properties-common" >> Dockerfile
+        echo "RUN add-apt-repository ppa:beineri/opt-qt-6.2.0-focal" >> Dockerfile
         echo "RUN apt-get update && apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libgl1-mesa-dev build-essential cmake libfuse2 wget" >> Dockerfile
         echo "COPY . /workspace" >> Dockerfile
         echo "WORKDIR /workspace" >> Dockerfile
         echo "RUN wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage && chmod +x linuxdeployqt-continuous-x86_64.AppImage" >> Dockerfile
         echo "RUN wget -c https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage && chmod +x appimagetool-x86_64.AppImage" >> Dockerfile
-        echo "RUN cmake -B build -S . -DCMAKE_PREFIX_PATH=/usr/lib/qt6" >> Dockerfile
+        echo "RUN cmake -B build -S . -DCMAKE_PREFIX_PATH=/opt/qt6" >> Dockerfile
         echo "RUN cmake --build build --config Release" >> Dockerfile
         echo "RUN ./linuxdeployqt-continuous-x86_64.AppImage build/your_executable -appimage" >> Dockerfile
 
