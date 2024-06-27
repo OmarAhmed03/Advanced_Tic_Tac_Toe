@@ -19,10 +19,11 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libgl1-mesa-dev build-essential cmake
+        sudo apt-get install -y libgl1-mesa-dev build-essential cmake wget libfuse2
+        sudo apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libgl1-mesa-dev build-essential cmake
 
     - name: Configure with CMake
-      run: cmake -B build -S . -DCMAKE_PREFIX_PATH=/opt/qt6
+      run: cmake -B build -S . -DCMAKE_PREFIX_PATH=/opt/Qt/6.7.0/gcc_64
 
     - name: Build with CMake
       run: cmake --build build --config Release
@@ -38,7 +39,7 @@ jobs:
       run: |
         echo "FROM ubuntu:20.04" > Dockerfile
         echo "RUN apt-get update && apt-get install -y software-properties-common" >> Dockerfile
-        echo "RUN add-apt-repository ppa:beineri/opt-qt-6.2.0-focal" >> Dockerfile
+        echo "RUN add-apt-repository ppa:beineri/opt-qt-6.7.0-focal" >> Dockerfile
         echo "RUN apt-get update && apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libgl1-mesa-dev build-essential cmake libfuse2 wget" >> Dockerfile
         echo "COPY . /workspace" >> Dockerfile
         echo "WORKDIR /workspace" >> Dockerfile
