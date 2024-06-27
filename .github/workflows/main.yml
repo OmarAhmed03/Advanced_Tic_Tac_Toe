@@ -1,0 +1,43 @@
+name: Build and Deploy on Linux
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libgl1-mesa-dev libglu1-mesa-dev build-essential cmake
+
+    - name: Configure with CMake
+      run: cmake -B build -S . -DCMAKE_PREFIX_PATH=/usr/lib/qt6
+
+    - name: Build with CMake
+      run: cmake --build build --config Release
+
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+      with:
+        tag_name: ${{ github.sha }}  # Use commit SHA as tag name (optional)
+        release_name: Advanced-Tic-Tac-Toe v${{ github.sha }}  # Release name with commit SHA
+          
+
+    - name: Upload Release Asset
+      uses: actions/upload-artifact@v3
+      with:
+        name: advanced-tic-tac-toe
+        path: build/Release/Advanced-Tic-Tac-Toe  # Modify path based on your build output
