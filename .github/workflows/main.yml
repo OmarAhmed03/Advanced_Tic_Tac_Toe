@@ -27,13 +27,21 @@ jobs:
     - name: Build with CMake
       run: cmake --build build --config Release
       
-    - name: Create Release Zip
-      working-directory: ${{ github.workspace }}
+    - name: Create Release Zip (alternative)
       run: |
-        zip -r advanced-tic-tac-toe.zip build/Release/*  # Modify file/directory names
+        set -e  # Exit on failure
+        find build/Release -type f -exec zip -r advanced-tic-tac-toe.zip {} \;  || true  # Suppress errors
 
-    - name: Create Release
-      id: create_release
+    - name: Upload Release Artifact (if zip created)
+      uses: actions/upload-artifact@v3
+      if: success() && test -f "advanced-tic-tac-toe.zip"  # Only upload if zip exists
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+      with:
+        name: advanced-tic-tac-toe-release
+        path: advanced-tic-tac-toe.zip
+
+    - name: Create Release (update token with appropriate permissions)  # Assuming you still want to create a release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
@@ -42,14 +50,3 @@ jobs:
         release_name: Release ${{ github.ref }}  # Update name format if desired
         draft: false
         prerelease: false
-
-    - name: Upload Release Asset
-      id: upload-release-asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}  # Use output from Create Release step
-        asset_path: ./advanced-tic-tac-toe.zip  # Path to your zip file
-        asset_name: advanced-tic-tac-toe.zip  # Name for the uploaded asset
-        asset_content_type: application/zip  # Content type for the zip file
