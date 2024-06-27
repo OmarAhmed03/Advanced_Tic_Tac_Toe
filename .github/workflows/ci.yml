@@ -23,7 +23,7 @@ jobs:
         sudo apt-get install -y appimagetool
         sudo apt-get install -y libfuse2
 
-   - name: Configure with CMake
+    - name: Configure with CMake
       run: cmake -B build -S . -DCMAKE_PREFIX_PATH=/usr/lib/qt6
 
     - name: Build with CMake
