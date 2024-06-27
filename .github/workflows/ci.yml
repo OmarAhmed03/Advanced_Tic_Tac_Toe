@@ -1,60 +1,48 @@
-name: Build and Deploy on Linux
+name: Build and Deploy AppImage
 
 on:
   push:
-    branches:
+    branches: 
       - main
   pull_request:
-    branches:
+    branches: 
       - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libgl1-mesa-dev build-essential cmake wget libfuse2
-        sudo apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libgl1-mesa-dev build-essential cmake
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libgl1-mesa-dev build-essential cmake appimagetool
 
-    - name: Configure with CMake
-      run: cmake -B build -S . -DCMAKE_PREFIX_PATH=/opt/Qt/6.7.0/gcc_64
+      - name: Configure with CMake
+        run: cmake -B build -S . -DCMAKE_PREFIX_PATH=/usr/lib/qt6
 
-    - name: Build with CMake
-      run: cmake --build build --config Release
+      - name: Build with CMake
+        run: cmake --build build --config Release
 
-    - name: Download tools
-      run: |
-        wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
-        chmod +x linuxdeployqt-continuous-x86_64.AppImage
-        wget -c https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
-        chmod +x appimagetool-x86_64.AppImage
+      - name: Create AppImage recipe
+        run: |
+          echo "name: 'Build'" > appimage.yml
+          echo "description: 'Your application description'" >> appimage.yml
+          echo "runtime: qt6" >> appimage.yml
+          echo "arch: x86_64" >> appimage.yml
+          echo "version: 1.0.0" >> appimage.yml  # Update with your version
+          # Add any additional dependencies here (optional)
+          echo "files:" >> appimage.yml
+          echo "  - '/path/to/build/*'" >> appimage.yml  # Modify path if needed
 
-    - name: Create Dockerfile
-      run: |
-        echo "FROM ubuntu:20.04" > Dockerfile
-        echo "RUN apt-get update && apt-get install -y software-properties-common" >> Dockerfile
-        echo "COPY . /workspace" >> Dockerfile
-        echo "WORKDIR /workspace" >> Dockerfile
-        echo "ENV Qt6_DIR=/opt/qt6/lib/cmake/Qt6" >> Dockerfile
-        echo "RUN wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage && chmod +x linuxdeployqt-continuous-x86_64.AppImage" >> Dockerfile
-        echo "RUN wget -c https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage && chmod +x appimagetool-x86_64.AppImage" >> Dockerfile
-        echo "RUN cmake -B build -S . -DCMAKE_PREFIX_PATH=/opt/qt6" >> Dockerfile
-        echo "RUN cmake --build build --config Release" >> Dockerfile
-        echo "RUN ./linuxdeployqt-continuous-x86_64.AppImage build/your_executable -appimage" >> Dockerfile
+      - name: Build AppImage
+        run: |
+          appimagetool --output=Build.AppImage appimage.yml
 
-    - name: Build Docker image and create AppImage
-      run: |
-        docker build -t appimage-builder .
-        docker run --rm -v $PWD:/workspace appimage-builder
-
-    - name: Archive AppImage
-      uses: actions/upload-artifact@v3
-      with:
-        name: AppImage
-        path: ./build/*.AppImage
+      - name: Archive build output (AppImage)
+        uses: actions/upload-artifact@v3
+        with:
+          name: AppImage
+          path: Build.AppImage
