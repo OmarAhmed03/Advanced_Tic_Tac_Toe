@@ -32,6 +32,7 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
       with:
+        tag_name: Advanced-Tic-Tac-Toe
         release_name: Advanced-Tic-Tac-Toe v${{ github.sha }}  # Release name with commit SHA
           
 
