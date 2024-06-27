@@ -42,7 +42,7 @@ jobs:
         echo "RUN apt-get update && apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libgl1-mesa-dev build-essential cmake libfuse2 wget" >> Dockerfile
         echo "COPY . /workspace" >> Dockerfile
         echo "WORKDIR /workspace" >> Dockerfile
-        echo "ENV CMAKE_PREFIX_PATH=/opt/qt6" >> Dockerfile
+        echo "ENV Qt6_DIR=/opt/qt6/lib/cmake/Qt6" >> Dockerfile
         echo "RUN wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage && chmod +x linuxdeployqt-continuous-x86_64.AppImage" >> Dockerfile
         echo "RUN wget -c https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage && chmod +x appimagetool-x86_64.AppImage" >> Dockerfile
         echo "RUN cmake -B build -S . -DCMAKE_PREFIX_PATH=/opt/qt6" >> Dockerfile
