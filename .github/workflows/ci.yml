@@ -22,7 +22,7 @@ jobs:
         sudo apt-get install -y libgl1-mesa-dev build-essential cmake
 
     - name: Configure with CMake
-      run: cmake -B build -S . -DCMAKE_PREFIX_PATH=/usr/lib/qt6
+      run: cmake -B build -S . -DCMAKE_PREFIX_PATH=/opt/qt6
 
     - name: Build with CMake
       run: cmake --build build --config Release
@@ -42,6 +42,7 @@ jobs:
         echo "RUN apt-get update && apt-get install -y qt6-base-dev qt6-tools-dev qt6-tools-dev-tools libgl1-mesa-dev build-essential cmake libfuse2 wget" >> Dockerfile
         echo "COPY . /workspace" >> Dockerfile
         echo "WORKDIR /workspace" >> Dockerfile
+        echo "ENV CMAKE_PREFIX_PATH=/opt/qt6" >> Dockerfile
         echo "RUN wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage && chmod +x linuxdeployqt-continuous-x86_64.AppImage" >> Dockerfile
         echo "RUN wget -c https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage && chmod +x appimagetool-x86_64.AppImage" >> Dockerfile
         echo "RUN cmake -B build -S . -DCMAKE_PREFIX_PATH=/opt/qt6" >> Dockerfile
