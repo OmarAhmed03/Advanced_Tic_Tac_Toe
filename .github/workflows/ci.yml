@@ -27,8 +27,17 @@ jobs:
     - name: Build with CMake
       run: cmake --build build --config Release
 
-    - name: Archive build output
+    - name: Download linuxdeployqt
+      run: |
+        wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+        chmod +x linuxdeployqt-continuous-x86_64.AppImage
+
+    - name: Create AppImage
+      run: |
+        ./linuxdeployqt-continuous-x86_64.AppImage build/your_executable -appimage
+
+    - name: Archive AppImage
       uses: actions/upload-artifact@v3
       with:
-        name: Build
-        path: build/
+        name: AppImage
+        path: ./build/*.AppImage
